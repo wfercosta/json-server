@@ -11,6 +11,7 @@ Object.keys(routes).forEach((key) => {
   const { method, collection } = routes[key];
   console.log(`\nRegistering route '${key}' with method '${method}' -> '${collection}'`);
   server[method](key, (req, res, next) => {
+    console.log(`\nAccess to route ${key}`);
     res.jsonp(db.get(collection).value());
   });
 });
