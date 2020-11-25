@@ -11,10 +11,15 @@ const port = 3000;
 const DEFAULT_KEY = 'default';
 
 const getObjectKey = async (token) => {
-  const decryptedInfo = await encryptionMethods.decryptSymetric(token);
-  const payload = JSON.parse(decryptedInfo);
+  try {
+    const decryptedInfo = await encryptionMethods.decryptSymetric(token);
+    const payload = JSON.parse(decryptedInfo);
 
-  return payload[process.env.ENCRYPTED_KEY] || DEFAULT_KEY;
+    return payload[process.env.ENCRYPTED_KEY] || DEFAULT_KEY;
+  } catch (err) {
+    console.log(`[index - getObjectKey] An error occurs ${err}`);
+  }
+  return {};
 };
 
 const buildResponse = async (collection, objectKey) => {
@@ -28,17 +33,16 @@ Object.keys(routes).forEach((key) => {
   const { method, collection } = routes[key];
   console.log(`\nRegistering route '${key}' with method '${method}' -> '${collection}'`);
   server[method](key, async (req, res, next) => {
-    console.log(`\nNew request arrived with key ${key} and headers ${JSON.stringify(req.headers)}`);
-    const token = req.headers.authorization;
+    try {
+      const token = req.headers.authorization;
+      const objectKey = getObjectKey(token);
+      const response = await buildResponse(collection, objectKey);
 
-    console.log(`\nToken value ${token}`);
-    const objectKey = getObjectKey(token);
-
-    console.log(`\nObject key ${JSON.stringify(objectKey)}`);
-    const response = await buildResponse(collection, objectKey);
-
-    console.log(`\nAccess to route ${key}`);
-    res.jsonp(response);
+      console.log(`\nAccess to route ${key}`);
+      res.jsonp(response);
+    } catch (err) {
+      console.log(`[index - getObjectKey] An error occurs ${err}`);
+    }
   });
 });
 
