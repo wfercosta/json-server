@@ -28,8 +28,13 @@ Object.keys(routes).forEach((key) => {
   const { method, collection } = routes[key];
   console.log(`\nRegistering route '${key}' with method '${method}' -> '${collection}'`);
   server[method](key, (req, res, next) => {
+    console.log(`\nNew request arrived with key ${key} and headers ${req.headers}`);
     const token = req.headers.Authorization;
+
+    console.log(`\nToken value ${token}`);
     const objectKey = getObjectKey(token);
+
+    console.log(`\nObject key ${objectKey}`);
     const response = buildResponse(collection, objectKey);
 
     console.log(`\nAccess to route ${key}`);
