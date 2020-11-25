@@ -1,7 +1,7 @@
 const jsonServer = require('json-server');
 const low = require('lowdb');
 const FileSync = require('lowdb/adapters/FileSync');
-const encryptionMethods = require('./encryptionMethods');
+const encryptionMethods = require('./encryptionMethods.js');
 const routes = require('./routes.json');
 
 const db = low(new FileSync('db.json'));
